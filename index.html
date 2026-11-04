@@ -92,6 +92,15 @@ td:first-child{color:var(--muted);font-family:'DM Mono',monospace}
 @keyframes pulse{50%{box-shadow:0 0 0 8px #55e6dc10}}
 @media(max-width:950px){.metric{grid-column:span 6}.speed-card,.chart-card{grid-column:span 12}.side-card,.details-card{grid-column:span 6}}
 @media(max-width:650px){.app{padding:17px 13px 30px}.topbar{align-items:flex-start}.pill{display:none}.hero{display:block}.hero-actions{margin-top:17px}.metric{grid-column:span 6;padding:15px;min-height:130px}.metric .value{font-size:27px}.speed-card,.side-card,.chart-card,.details-card,.history-card{grid-column:span 12}.speed-layout{grid-template-columns:1fr}.gauge{width:185px;height:185px}.speed-info{text-align:center}.test-stats{gap:6px}.test-stat{padding:9px}.test-stat b{font-size:15px}.side-card{min-height:auto}}
+
+/* NetPulse assistant */
+.chat-launch{position:fixed;right:24px;bottom:24px;z-index:1000;border:0;border-radius:999px;padding:14px 18px;background:linear-gradient(110deg,#55e6dc,#7195ff);color:#071321;font-weight:900;box-shadow:0 12px 38px #0009;display:flex;align-items:center;gap:10px}
+.chat-launch .chat-spark{font-size:20px}.chat-panel{position:fixed;right:24px;bottom:88px;width:min(380px,calc(100vw - 28px));height:min(560px,calc(100vh - 125px));z-index:1001;background:#0d1729;border:1px solid #314766;border-radius:20px;box-shadow:0 24px 80px #000b;display:none;flex-direction:column;overflow:hidden}
+.chat-panel.open{display:flex}.chat-head{padding:16px;background:linear-gradient(110deg,#142b43,#20204a);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #31415d}
+.chat-brand{display:flex;align-items:center;gap:10px}.chat-avatar{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#55e6dc,#7195ff);display:grid;place-items:center;color:#071321;font-weight:900}.chat-brand b{font-size:13px}.chat-brand small{display:block;color:#a7b6ce;font-size:10px;margin-top:3px}.chat-close{border:1px solid #40516e;background:#ffffff0c;color:#eef4ff;border-radius:9px;padding:7px 10px}
+.chat-messages{padding:15px;display:flex;flex:1;flex-direction:column;gap:10px;overflow:auto}.chat-msg{max-width:88%;padding:11px 13px;border-radius:14px;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.chat-msg.bot{background:#18263d;border:1px solid #2b3b56;align-self:flex-start;color:#eaf2ff;border-bottom-left-radius:4px}.chat-msg.user{background:linear-gradient(110deg,#1d8190,#435ca8);align-self:flex-end;color:white;border-bottom-right-radius:4px}.chat-suggestions{padding:0 13px 10px;display:flex;gap:7px;flex-wrap:wrap}.chat-suggestions button{font-size:10px;border:1px solid #34516d;background:#12243a;color:#aeeef0;border-radius:20px;padding:7px 9px}.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid #263650;background:#0a1322}.chat-input-row input{min-width:0;flex:1;border:1px solid #31415d;border-radius:11px;background:#111e32;color:#eef4ff;padding:11px;font:inherit;font-size:12px;outline:none}.chat-input-row input:focus{border-color:#55e6dc}.chat-send{border:0;border-radius:11px;padding:0 14px;background:#55e6dc;color:#071321;font-weight:900}.chat-note{font-size:9px;color:#8495af;text-align:center;padding:0 12px 9px}
+@media(max-width:600px){.chat-launch{right:14px;bottom:14px;padding:12px 15px}.chat-panel{right:14px;bottom:76px}}
+
 </style>
 </head>
 <body>
@@ -131,6 +140,123 @@ td:first-child{color:var(--muted);font-family:'DM Mono',monospace}
   </article>
   <article class="card metric">
     <div class="tiny">Latency / Ping</div><div class="value" id="pingMetric">— <span class="unit">ms</span></div>
+    <div class="metric-foot"><i class="mini-line" style="background:var(--amber)"></i>Round-trip response time</div>
+  </article>
+  <article class="card metric">
+    <div class="tiny">Jitter</div><div class="value" id="jitterMetric">— <span class="unit">ms</span></div>
+    <div class="metric-foot"><i class="mini-line" style="background:var(--green)"></i>Ping variation</div>
+  </article>
+
+  <article class="card speed-card">
+    <div class="card-head"><h3>Connection performance</h3><span class="tiny" id="testStatus">READY TO TEST</span></div>
+    <div class="speed-layout">
+      <div class="gauge">
+        <svg viewBox="0 0 200 200" aria-label="Download speed gauge">
+          <defs><linearGradient id="grad"><stop stop-color="#55e6dc"/><stop offset="1" stop-color="#7195ff"/></linearGradient></defs>
+          <circle class="track" cx="100" cy="100" r="90"/>
+          <circle class="progress" id="gaugeProgress" cx="100" cy="100" r="90"/>
+        </svg>
+        <div class="gauge-center"><strong id="gaugeValue">0.0</strong><span>Mbps download</span></div>
+      </div>
+      <div class="speed-info">
+        <h4 id="testTitle">Ready when you are</h4>
+        <p id="testDescription">Run a test to measure download, upload and latency. For accurate results, pause other downloads and keep this tab open.</p>
+        <div class="test-stats">
+          <div class="test-stat"><span>DOWNLOAD</span><b id="testDown">—</b></div>
+          <div class="test-stat"><span>UPLOAD</span><b id="testUp">—</b></div>
+          <div class="test-stat"><span>PING</span><b id="testPing">—</b></div>
+        </div>
+        <div class="test-buttons">
+          <button class="primary" id="runTest2">▶ Start test</button>
+          <button class="secondary" id="quickPing">↻ Quick ping</button>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card side-card">
+    <div class="card-head"><h3>Network quality estimate</h3><span class="tiny">LIVE</span></div>
+    <div class="signal-score">
+      <div class="score-ring" id="scoreRing"><b id="qualityScore">—</b></div>
+      <div><h4 id="qualityLabel">Awaiting data</h4><p id="qualityText">Run a test to estimate your connection quality.</p></div>
+    </div>
+    <div class="bars">
+      <div class="bar-row"><span>Latency</span><div class="bar"><i id="latBar"></i></div><b id="latVal">—</b></div>
+      <div class="bar-row"><span>Download</span><div class="bar"><i id="dlBar"></i></div><b id="dlVal">—</b></div>
+      <div class="bar-row"><span>Upload</span><div class="bar"><i id="ulBar"></i></div><b id="ulVal">—</b></div>
+    </div>
+    <p class="tiny" style="margin-top:16px;line-height:1.6">Quality score is an estimate from measured performance, not a cellular signal-strength reading.</p>
+  </article>
+
+  <article class="card chart-card">
+    <div class="card-head"><h3>Network activity timeline</h3><span class="tiny" id="chartCount">0 samples</span></div>
+    <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    <div class="chart-legend"><span><i class="legend-dot" style="background:var(--cyan)"></i>Download Mbps</span><span><i class="legend-dot" style="background:var(--blue)"></i>Upload Mbps</span><span><i class="legend-dot" style="background:var(--amber)"></i>Ping ms (scaled)</span></div>
+  </article>
+
+  <article class="card details-card">
+    <div class="card-head"><h3>Device & network details</h3><span class="tiny">BROWSER API</span></div>
+    <div class="details">
+      <div class="detail"><span>Connection type</span><b id="netType">—</b></div>
+      <div class="detail"><span>Effective type</span><b id="effectiveType">—</b></div>
+      <div class="detail"><span>Browser downlink</span><b id="browserDown">—</b></div>
+      <div class="detail"><span>Browser RTT</span><b id="browserRtt">—</b></div>
+      <div class="detail"><span>Online status</span><b id="onlineStatus">—</b></div>
+      <div class="detail"><span>Data saver</span><b id="saveData">—</b></div>
+      <div class="detail"><span>Last update</span><b id="lastUpdate">—</b></div>
+      <div class="detail"><span>Monitoring</span><b id="monitorState">Stopped</b></div>
+    </div>
+  </article>
+
+  <article class="card history-card">
+    <div class="card-head"><h3>Session history</h3><span class="tiny">LATEST 12 RECORDS</span></div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Time</th><th>Download</th><th>Upload</th><th>Ping</th><th>Jitter</th><th>Quality</th></tr></thead>
+      <tbody id="historyBody"><tr><td colspan="6" class="empty">No measurements yet. Run your first speed test.</td></tr></tbody></table>
+    </div>
+  </article>
+</div>
+<div class="footer"><span>NETPULSE • Personal network diagnostics dashboard</span><span>Measurements depend on your browser, device, network and test server.</span></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- NetPulse smart assistant: local rule-based help; no external AI API required -->
+<section class="chat-panel" id="chatPanel" aria-label="NetPulse assistant" aria-hidden="true">
+  <header class="chat-head"><div class="chat-brand"><div class="chat-avatar">N✦</div><div><b>NetPulse Assistant</b><small><span style="color:#53e0a0">●</span> Online · Smart help</small></div></div><button class="chat-close" id="chatClose" aria-label="Close assistant">✕</button></header>
+  <div class="chat-messages" id="chatMessages" aria-live="polite"><div class="chat-msg bot">Hi! I'm your NetPulse assistant. I can explain your network results, help troubleshoot slow internet, and guide you around the dashboard. What would you like to know?</div></div>
+  <div class="chat-suggestions"><button data-question="Explain my network results">Explain my results</button><button data-question="Why is my internet slow?">Slow internet</button><button data-question="What are ping and jitter?">Ping & jitter</button></div>
+  <form class="chat-input-row" id="chatForm"><input id="chatInput" type="text" maxlength="500" placeholder="Ask about your network…" autocomplete="off" aria-label="Message the assistant"><button class="chat-send" type="submit">Send</button></form>
+  <div class="chat-note">Built-in assistant · Responses are guidance, not a live AI service</div>
+</section>
+<button class="chat-launch" id="chatLaunch" aria-label="Open NetPulse assistant"><span class="chat-spark">✦</span> Ask NetPulse</button>
+
+
+<script>
+/*
+  NETPULSE NOTES:
+  - Browser APIs generally do NOT expose real cellular/Wi-Fi signal strength in dBm.
+  - The Network Information API is not supported by every browser.
+  - Speed tests use Cloudflare's public speed-test endpoints and require internet access.
+  - Results vary with server load, Wi-Fi conditions, VPNs and other traffic.
+*/
+const $ = id => document.getElementById(id);
+const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+let historyData = [];
+let monitoring = false;
+let monitorTimer = null;
+let lastPing = null;
+let pingSamples = [];
+let testing = false;
+
+function toast(msg){
+  const el=$("toast");el.textContent=msg;el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),2600);
+}
+function fmt(n,d=1){return Number.isFinite(n)?n.toFixed(d):"—"}
+function updateDevice(){
+  const online=navigator.onLine;
+  $("connectionState").textContent=online?"Device online":"Offline";
+  $("liveDot").style.background=online?"var(--green)":class="tiny">Latency / Ping</div><div class="value" id="pingMetric">— <span class="unit">ms</span></div>
     <div class="metric-foot"><i class="mini-line" style="background:var(--amber)"></i>Round-trip response time</div>
   </article>
   <article class="card metric">
